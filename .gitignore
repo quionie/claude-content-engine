@@ -1,6 +1,9 @@
 # Claude Code local config
 .claude/
 
+# Python
+__pycache__/
+
 # OS files
 .DS_Store
 Thumbs.db

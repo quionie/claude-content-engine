@@ -1,0 +1,33 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Run hook tests
+        run: python3 tests/test_hooks.py
+
+      - name: Check installer syntax
+        run: bash -n install.sh
+
+      - name: Validate JSON files
+        run: |
+          for f in .claude-plugin/plugin.json .claude-plugin/marketplace.json hooks/hooks.json; do
+            python3 -m json.tool "$f" > /dev/null && echo "ok: $f"
+          done
+
+      - name: Check every skill has frontmatter
+        run: |
+          for skill in skills/*/SKILL.md; do
+            head -1 "$skill" | grep -qx -- '---' || { echo "missing frontmatter: $skill"; exit 1; }
+            grep -q '^name:' "$skill" || { echo "missing name: $skill"; exit 1; }
+            grep -q '^description:' "$skill" || { echo "missing description: $skill"; exit 1; }
+            echo "ok: $skill"
+          done
