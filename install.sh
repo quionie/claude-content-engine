@@ -1,7 +1,10 @@
 #!/usr/bin/env bash
 #
 # claude-content-engine installer
-# Install, update, or uninstall the claude-content-engine for Claude Code.
+# Install, update, or uninstall claude-content-engine for Claude Code.
+#
+# Uses the `claude plugin` CLI so the marketplace and plugin are registered
+# through Claude Code itself - no hand-editing of config files.
 #
 # Usage:
 #   curl -fsSL https://raw.githubusercontent.com/quionie/claude-content-engine/main/install.sh | bash
@@ -12,13 +15,9 @@
 set -euo pipefail
 
 # --- Configuration ---
-REPO_URL="https://github.com/quionie/claude-content-engine.git"
-PACK_NAME="claude-content-engine"
-CLAUDE_DIR="${HOME}/.claude"
-PLUGINS_DIR="${CLAUDE_DIR}/plugins"
-MARKETPLACES_DIR="${PLUGINS_DIR}/marketplaces"
-INSTALL_DIR="${MARKETPLACES_DIR}/${PACK_NAME}"
-KNOWN_MARKETPLACES="${PLUGINS_DIR}/known_marketplaces.json"
+MARKETPLACE_REPO="quionie/claude-content-engine"
+MARKETPLACE_NAME="claude-content-engine"
+PLUGIN_ID="claude-content-engine@claude-content-engine"
 
 # --- Colors ---
 RED='\033[0;31m'
@@ -34,144 +33,64 @@ success() { printf "${GREEN}[ok]${NC}    %s\n" "$1"; }
 warn()    { printf "${YELLOW}[warn]${NC}  %s\n" "$1"; }
 error()   { printf "${RED}[error]${NC} %s\n" "$1" >&2; }
 
-check_dependency() {
-    if ! command -v "$1" &> /dev/null; then
-        error "$1 is required but not installed."
-        exit 1
-    fi
-}
-
 # --- Pre-flight checks ---
 preflight() {
-    check_dependency git
-    check_dependency jq
-
-    if [ ! -d "${CLAUDE_DIR}" ]; then
-        error "Claude Code config directory not found at ${CLAUDE_DIR}"
-        error "Is Claude Code installed? Visit https://claude.ai/code to get started."
+    if ! command -v claude &> /dev/null; then
+        error "The 'claude' CLI is required but was not found."
+        error "Install Claude Code first: https://claude.com/claude-code"
         exit 1
     fi
 
-    # Create plugins directories if they don't exist
-    mkdir -p "${MARKETPLACES_DIR}"
-
-    # Initialize known_marketplaces.json if it doesn't exist
-    if [ ! -f "${KNOWN_MARKETPLACES}" ]; then
-        printf '{}' > "${KNOWN_MARKETPLACES}"
-    fi
-
-    # Validate known_marketplaces.json is valid JSON
-    if ! jq empty "${KNOWN_MARKETPLACES}" 2>/dev/null; then
-        error "${KNOWN_MARKETPLACES} is not valid JSON. Please fix it manually."
-        exit 1
+    if ! command -v python3 &> /dev/null; then
+        warn "python3 not found. The skills will work, but the quality gate"
+        warn "hooks (AI slop detector) need python3 to run."
     fi
 }
 
 # --- Install ---
 do_install() {
-    if [ -d "${INSTALL_DIR}" ]; then
-        warn "claude-content-engine is already installed at ${INSTALL_DIR}"
-        info "Run with --update to pull the latest version."
-        exit 0
+    info "Adding the ${MARKETPLACE_NAME} marketplace..."
+    if ! claude plugin marketplace add "${MARKETPLACE_REPO}" 2>/dev/null; then
+        info "Marketplace already added - refreshing it instead."
+        claude plugin marketplace update "${MARKETPLACE_NAME}"
     fi
 
-    info "Cloning claude-content-engine..."
-    git clone --depth 1 --single-branch "${REPO_URL}" "${INSTALL_DIR}" 2>/dev/null
-
-    if [ ! -d "${INSTALL_DIR}/.claude-plugin" ]; then
-        error "Clone succeeded but plugin structure is invalid. Cleaning up."
-        rm -rf "${INSTALL_DIR}"
-        exit 1
-    fi
-
-    register_marketplace
+    info "Installing the plugin..."
+    claude plugin install "${PLUGIN_ID}"
 
     printf "\n"
-    success "claude-content-engine installed successfully!"
+    success "claude-content-engine installed!"
     printf "\n"
-    list_skills
-    printf "\n"
-    info "Restart Claude Code to activate your new skills."
-    info "To update later: ${BOLD}./install.sh --update${NC} (or re-run this script with --update)"
+    info "Run ${BOLD}/reload-plugins${NC} in an open Claude Code session (or restart) to activate."
+    info "To update later: ${BOLD}./install.sh --update${NC}"
     info "To uninstall:    ${BOLD}./install.sh --uninstall${NC}"
 }
 
 # --- Update ---
 do_update() {
-    if [ ! -d "${INSTALL_DIR}" ]; then
-        error "claude-content-engine is not installed. Run without flags to install."
-        exit 1
-    fi
+    info "Refreshing the marketplace..."
+    claude plugin marketplace update "${MARKETPLACE_NAME}"
 
-    info "Updating claude-content-engine..."
-    git -C "${INSTALL_DIR}" fetch --depth 1 origin main 2>/dev/null
-    git -C "${INSTALL_DIR}" reset --hard origin/main 2>/dev/null
+    info "Reinstalling the plugin at the latest version..."
+    claude plugin install "${PLUGIN_ID}"
 
     printf "\n"
-    success "claude-content-engine updated to the latest version!"
-    printf "\n"
-    list_skills
-    printf "\n"
-    info "Restart Claude Code to pick up changes."
+    success "claude-content-engine is up to date."
+    info "Run ${BOLD}/reload-plugins${NC} in an open session (or restart) to pick up changes."
 }
 
 # --- Uninstall ---
 do_uninstall() {
-    if [ ! -d "${INSTALL_DIR}" ]; then
-        warn "claude-content-engine is not installed. Nothing to do."
-        exit 0
-    fi
+    info "Uninstalling the plugin..."
+    claude plugin uninstall "${PLUGIN_ID}" || warn "Plugin was not installed."
 
-    info "Removing claude-content-engine..."
-    rm -rf "${INSTALL_DIR}"
-
-    # Remove from known_marketplaces.json
-    if [ -f "${KNOWN_MARKETPLACES}" ] && jq -e ".\"${PACK_NAME}\"" "${KNOWN_MARKETPLACES}" > /dev/null 2>&1; then
-        local tmp
-        tmp=$(mktemp)
-        jq "del(.\"${PACK_NAME}\")" "${KNOWN_MARKETPLACES}" > "${tmp}" && mv "${tmp}" "${KNOWN_MARKETPLACES}"
-    fi
+    info "Removing the marketplace..."
+    claude plugin marketplace remove "${MARKETPLACE_NAME}" || warn "Marketplace was not registered."
 
     printf "\n"
     success "claude-content-engine has been uninstalled."
-    info "Restart Claude Code to complete removal."
-}
-
-# --- Register in known_marketplaces.json ---
-register_marketplace() {
-    local tmp
-    tmp=$(mktemp)
-    local timestamp
-    timestamp=$(date -u +"%Y-%m-%dT%H:%M:%S.000Z")
-
-    jq --arg name "${PACK_NAME}" \
-       --arg loc "${INSTALL_DIR}" \
-       --arg ts "${timestamp}" \
-       --arg repo "${REPO_URL}" \
-       '.[$name] = {
-         "source": { "source": "github", "repo": $repo },
-         "installLocation": $loc,
-         "lastUpdated": $ts
-       }' "${KNOWN_MARKETPLACES}" > "${tmp}" && mv "${tmp}" "${KNOWN_MARKETPLACES}"
-
-    success "Registered in Claude Code plugin system."
-}
-
-# --- List installed skills ---
-list_skills() {
-    printf "${BOLD}Installed skills:${NC}\n"
-    local count=0
-    if [ -d "${INSTALL_DIR}/skills" ]; then
-        for skill_dir in "${INSTALL_DIR}"/skills/*/; do
-            if [ -f "${skill_dir}SKILL.md" ]; then
-                local skill_name
-                skill_name=$(basename "${skill_dir}")
-                printf "  ${GREEN}✓${NC} %s\n" "${skill_name}"
-                count=$((count + 1))
-            fi
-        done
-    fi
-    printf "\n  ${BOLD}%d skills ready to use.${NC}\n" "${count}"
+    info "Your content memory at ~/.claude-content-engine/ was left in place."
+    info "Remove it with: ${BOLD}rm -rf ~/.claude-content-engine${NC}"
 }
 
 # --- Main ---

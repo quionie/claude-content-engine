@@ -1,0 +1,22 @@
+{
+  "name": "claude-content-engine",
+  "owner": {
+    "name": "Quionie"
+  },
+  "metadata": {
+    "description": "Content creation skills for Claude Code: writing, repurposing, brand voice, email sequences, and an automatic AI slop detector."
+  },
+  "plugins": [
+    {
+      "name": "claude-content-engine",
+      "source": "./",
+      "description": "A content creation engine for Claude Code. 8 specialized skills, persistent content memory, skill chaining, and an AI slop detector that runs on every output.",
+      "version": "2.1.0",
+      "category": "productivity",
+      "author": {
+        "name": "Quionie"
+      },
+      "homepage": "https://github.com/quionie/claude-content-engine"
+    }
+  ]
+}
