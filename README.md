@@ -7,9 +7,10 @@
 8 specialized skills. Persistent memory. A built-in quality gate that kills AI slop.<br>
 Install in one command. Zero config.
 
+[![CI](https://github.com/quionie/claude-content-engine/actions/workflows/ci.yml/badge.svg)](https://github.com/quionie/claude-content-engine/actions/workflows/ci.yml)
 [![MIT License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 [![Skills](https://img.shields.io/badge/skills-8-green.svg)](#skills)
-[![Claude Code](https://img.shields.io/badge/Claude_Code-plugin-8A2BE2.svg)](https://claude.ai/code)
+[![Claude Code](https://img.shields.io/badge/Claude_Code-plugin-8A2BE2.svg)](https://claude.com/claude-code)
 
 [Install](#install) · [Skills](#skills) · [Advanced Features](#advanced-features) · [Contributing](CONTRIBUTING.md)
 
@@ -18,8 +19,6 @@ Install in one command. Zero config.
 ---
 
 ## Why this exists
-
-Claude is already a strong writer. But there's a difference between "write me a blog post" and giving it a full content playbook - voice profiles, SEO structure, copywriting frameworks, platform-specific formatting, and a quality gate that catches lazy patterns before you see them.
 
 **claude-content-engine** installs 8 content skills, a persistent memory system, and an automatic slop detector into Claude Code. One command, zero config.
 
@@ -33,32 +32,40 @@ Claude picks the right skill, loads your saved voice profile, writes all three p
 
 ## Install
 
+From inside Claude Code:
+
+```
+/plugin marketplace add quionie/claude-content-engine
+/plugin install claude-content-engine@claude-content-engine
+```
+
+Or from your terminal:
+
 ```bash
 curl -fsSL https://raw.githubusercontent.com/quionie/claude-content-engine/main/install.sh | bash
 ```
 
-Requires `git`, `jq`, and `python3` (for the quality gate hooks).
+Then run `/reload-plugins` in an open session (or restart Claude Code). Done.
 
-Restart Claude Code. Done.
+Requires Claude Code with plugin support, plus `python3` for the quality gate hooks. The skills work fine without python3 - you just lose the automatic slop detection.
 
 <details>
-<summary>Manual install / update / uninstall</summary>
-
-**Clone manually:**
-```bash
-git clone https://github.com/quionie/claude-content-engine.git \
-  ~/.claude/plugins/marketplaces/claude-content-engine
-```
+<summary>Update / uninstall</summary>
 
 **Update:**
-```bash
-~/.claude/plugins/marketplaces/claude-content-engine/install.sh --update
 ```
+/plugin marketplace update claude-content-engine
+```
+or `./install.sh --update` from the terminal.
 
 **Uninstall:**
-```bash
-~/.claude/plugins/marketplaces/claude-content-engine/install.sh --uninstall
 ```
+/plugin uninstall claude-content-engine@claude-content-engine
+/plugin marketplace remove claude-content-engine
+```
+or `./install.sh --uninstall` from the terminal.
+
+Uninstalling leaves your content memory at `~/.claude-content-engine/` in place. Remove it with `rm -rf ~/.claude-content-engine` if you want a clean slate.
 
 </details>
 
@@ -120,9 +127,9 @@ Memory is **local-only** (stored on your machine, never uploaded), **opt-in** (y
 
 ### 3. Quality Gate (AI Slop Detector)
 
-A hook that runs automatically on every piece of content Claude writes. It catches:
+A hook that runs automatically on every piece of content Claude writes. Roughly 50 patterns across three severity tiers:
 
-- **Hard slop** - "delve", "tapestry", "in today's fast-paced world", "it's important to note", "game-changer", "seamlessly" - and 30+ more patterns
+- **Hard slop** - "delve", "tapestry", "in today's fast-paced world", "it's important to note", "game-changer", "seamlessly", and friends
 - **Soft slop** - "let's dive in", "as we've seen", "the landscape of" - flagged when multiple appear together
 - **Weak copy** - "very good", "in order to", "I think that" - with specific rewrite suggestions
 - **Fake enthusiasm** - excessive exclamation marks that read as performative
@@ -130,9 +137,13 @@ A hook that runs automatically on every piece of content Claude writes. It catch
 Claude gets the feedback and rewrites before you see the final output. You don't have to do anything.
 
 ```
-PostToolUse hook → scans written content → flags issues → Claude rewrites
-Stop hook → final pass → catches anything that slipped through
+PostToolUse hook → scans content files Claude writes → feeds findings back
+                   into Claude's context → Claude rewrites before finishing
+Stop hook       → scans Claude's final message → blocks completion if it
+                   contains multiple hard-slop phrases → Claude fixes it first
 ```
+
+The gate is tuned to stay out of your way: it only scans content files (`.md`, `.txt`, `.html` - never code), the final-message check only fires on substantial responses with two or more hard-slop hits, and it never blocks the same response twice. Technical usage like "robust error handling" and "leverage ratio" is allowlisted.
 
 ## How It Works
 
@@ -149,7 +160,7 @@ version: 1.0.0
 [Detailed instructions for Claude]
 ```
 
-The hooks are Python scripts that run via Claude Code's [hook system](https://docs.anthropic.com/en/docs/claude-code/hooks). They inspect content post-write and inject feedback before Claude finalizes its response.
+The hooks are Python scripts that run via Claude Code's [hook system](https://code.claude.com/docs/en/hooks). The PostToolUse hook returns findings as `additionalContext`, which Claude Code injects into Claude's context so it self-corrects. The Stop hook checks the final message and can block completion until flagged phrases are rewritten.
 
 ## Architecture
 
@@ -166,9 +177,15 @@ claude-content-engine/
 │   └── content-memory/SKILL.md         ← persistent content memory
 ├── hooks/                         # quality gate system
 │   ├── hooks.json                      ← hook configuration
+│   ├── slop_patterns.py                ← shared pattern library + scanner
 │   ├── quality_gate.py                 ← PostToolUse AI slop detector
-│   └── content_review.py              ← Stop hook final pass
-├── .claude-plugin/plugin.json     # plugin metadata
+│   └── content_review.py               ← Stop hook final pass
+├── tests/
+│   └── test_hooks.py              # hook test suite (python3, no deps)
+├── .claude-plugin/
+│   ├── plugin.json                # plugin manifest
+│   └── marketplace.json           # marketplace catalog (this repo is both)
+├── .github/workflows/ci.yml      # tests + lint on every push
 ├── install.sh                     # one-line installer
 ├── CONTRIBUTING.md
 └── LICENSE
@@ -193,7 +210,7 @@ Shouldn't. Claude picks the most relevant skill based on your prompt. If you hav
 
 <details>
 <summary><strong>Can I disable the quality gate?</strong></summary>
-Yes. Delete <code>hooks/</code> or remove entries from <code>hooks/hooks.json</code>. The skills work fine without it.
+Yes. Remove the entries from <code>hooks/hooks.json</code> in your installed copy of the plugin, then run <code>/reload-plugins</code>. The skills work fine without it.
 </details>
 
 <details>
@@ -208,7 +225,7 @@ Yes. They're markdown files. Edit them, fork them, rewrite them entirely.
 
 ## Contributing
 
-We accept new skills. See [CONTRIBUTING.md](CONTRIBUTING.md) for the format and quality checklist.
+New skills are accepted. See [CONTRIBUTING.md](CONTRIBUTING.md) for the format and quality checklist.
 
 ## License
 

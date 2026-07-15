@@ -47,6 +47,14 @@ Before submitting, make sure your skill:
 3. Try 3-5 different prompts that should trigger your skill
 4. Verify it activates correctly and produces useful output
 
+If you touched the hooks, also run the test suite (CI runs it on every PR):
+
+```bash
+python3 tests/test_hooks.py
+```
+
+The slop pattern lists live in `hooks/slop_patterns.py` - both hooks import from there, so add new patterns in that one place.
+
 ### 5. Submit a PR
 
 Your PR description should include:
