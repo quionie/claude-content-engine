@@ -8,8 +8,10 @@ with a rewrite instruction so Claude fixes the text before the turn ends.
 
 This is a lightweight final pass - the heavy lifting is done by
 quality_gate.py on each write operation. To keep it from firing on ordinary
-conversation (where a stray "robust" is fine), it only blocks when the final
-message is substantial AND contains two or more distinct hard-slop phrases.
+conversation, it only blocks when the final message is substantial AND
+contains three or more distinct hard-slop phrases - and the hard list holds
+only phrases that are damning in any context ("delve", "tapestry", "in
+today's fast-paced world"), not words with legitimate technical use.
 """
 
 import json
@@ -22,7 +24,7 @@ from slop_patterns import scan_content
 MIN_MESSAGE_LENGTH = 200
 
 # Require this many distinct hard-slop findings before blocking the stop.
-MIN_HARD_FINDINGS = 2
+MIN_HARD_FINDINGS = 3
 
 
 def main():

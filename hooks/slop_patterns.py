@@ -23,9 +23,6 @@ HARD_SLOP = [
     r"\bparadigm shift\b",
     r"\bsynergy\b",
     r"\bholistic approach\b",
-    r"\bseamless(?:ly)?\b",
-    r"\bleverage\b(?! (?:ratio|point))",  # allow financial usage
-    r"\brobust\b(?! (?:error|test|check))",  # allow technical usage
     r"\bcut(?:ting)?[ -]?edge\b",
     r"\binnovative solution\b",
     r"\bempowering\b",
@@ -39,7 +36,14 @@ HARD_SLOP = [
 ]
 
 SOFT_SLOP = [
-    # Phrases that are sometimes fine but often signal AI filler
+    # Phrases that are sometimes fine but often signal AI filler.
+    # "seamless", "leverage", and "robust" live here rather than in HARD_SLOP:
+    # they're overused in marketing copy but ordinary in technical writing,
+    # and hard-flagging them made the Stop hook police normal engineering
+    # conversation.
+    r"\bseamless(?:ly)?\b",
+    r"\bleverage\b(?! (?:ratio|point))",  # allow financial usage
+    r"\brobust\b(?! (?:error|test|check))",  # allow technical usage
     r"\bin conclusion\b",
     r"\bas we'?ve (?:seen|discussed|explored)\b",
     r"\blet'?s (?:dive|explore|unpack)\b",

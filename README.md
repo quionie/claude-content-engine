@@ -55,8 +55,9 @@ Requires Claude Code with plugin support, plus `python3` for the quality gate ho
 **Update:**
 ```
 /plugin marketplace update claude-content-engine
+/plugin install claude-content-engine@claude-content-engine
 ```
-or `./install.sh --update` from the terminal.
+The second command matters: refreshing the marketplace only updates the catalog, and auto-update is off by default for third-party marketplaces, so reinstalling is what actually picks up the new version. Or run `./install.sh --update` from the terminal, which does both.
 
 **Uninstall:**
 ```
@@ -129,8 +130,8 @@ Memory is **local-only** (stored on your machine, never uploaded), **opt-in** (y
 
 A hook that runs automatically on every piece of content Claude writes. Roughly 50 patterns across three severity tiers:
 
-- **Hard slop** - "delve", "tapestry", "in today's fast-paced world", "it's important to note", "game-changer", "seamlessly", and friends
-- **Soft slop** - "let's dive in", "as we've seen", "the landscape of" - flagged when multiple appear together
+- **Hard slop** - "delve", "tapestry", "in today's fast-paced world", "it's important to note", "game-changer", and friends
+- **Soft slop** - "let's dive in", "as we've seen", "seamlessly", "the landscape of" - flagged when multiple appear together
 - **Weak copy** - "very good", "in order to", "I think that" - with specific rewrite suggestions
 - **Fake enthusiasm** - excessive exclamation marks that read as performative
 
@@ -143,7 +144,7 @@ Stop hook       → scans Claude's final message → blocks completion if it
                    contains multiple hard-slop phrases → Claude fixes it first
 ```
 
-The gate is tuned to stay out of your way: it only scans content files (`.md`, `.txt`, `.html` - never code), the final-message check only fires on substantial responses with two or more hard-slop hits, and it never blocks the same response twice. Technical usage like "robust error handling" and "leverage ratio" is allowlisted.
+The gate is tuned to stay out of your way: it only scans content files (`.md`, `.txt`, `.html` - never code), the final-message check only fires on substantial responses with three or more hard-slop hits, and it never blocks the same response twice. Words that are ordinary in technical conversation ("robust", "leverage", "seamless") are treated as soft signals rather than hard ones, so the gate won't nag you in coding sessions, and usage like "robust error handling" or "leverage ratio" is allowlisted entirely.
 
 ## How It Works
 

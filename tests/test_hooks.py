@@ -34,6 +34,16 @@ CLEAN_TEXT = (
     "lag a write by up to thirty seconds."
 )
 
+# A normal coding-session summary. Blocking this was a real bug: "robust",
+# "seamlessly", and "leverage" are ordinary words in technical conversation.
+ENGINEERING_TEXT = (
+    "I refactored the sync layer so the retry logic is more robust and the "
+    "migration between the two schema versions happens seamlessly. The new "
+    "adapter also lets us leverage the existing connection pool instead of "
+    "opening new sockets, which cut p95 latency by roughly forty percent in "
+    "the staging benchmarks."
+)
+
 
 def run_hook(script, payload):
     """Pipe a JSON payload into a hook script and return its parsed output."""
@@ -158,8 +168,19 @@ class TestContentReview(unittest.TestCase):
         self.assertEqual(code, 0)
         self.assertEqual(output, {})
 
-    def test_single_hard_match_is_tolerated(self):
-        message = CLEAN_TEXT + " Overall the migration made the system feel seamless."
+    def test_engineering_talk_is_not_blocked(self):
+        code, output = run_hook("content_review.py", {
+            "last_assistant_message": ENGINEERING_TEXT,
+            "stop_hook_active": False,
+        })
+        self.assertEqual(code, 0)
+        self.assertEqual(output, {})
+
+    def test_two_hard_matches_are_tolerated(self):
+        message = (
+            CLEAN_TEXT + " Some would call the rewrite a game-changer, and "
+            "yes, it's worth noting the pager stayed quiet through launch week."
+        )
         code, output = run_hook("content_review.py", {
             "last_assistant_message": message,
             "stop_hook_active": False,
