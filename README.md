@@ -12,7 +12,9 @@ Install in one command. Zero config.
 [![Skills](https://img.shields.io/badge/skills-8-green.svg)](#skills)
 [![Claude Code](https://img.shields.io/badge/Claude_Code-plugin-8A2BE2.svg)](https://claude.com/claude-code)
 
-[Install](#install) · [Skills](#skills) · [Advanced Features](#advanced-features) · [Contributing](CONTRIBUTING.md)
+[Install](#install) · [Skills](#skills) · [Advanced Features](#advanced-features) · [Changelog](CHANGELOG.md) · [Contributing](CONTRIBUTING.md)
+
+<img src="assets/demo.gif" alt="One prompt turning a blog post into a Twitter thread, a LinkedIn post, and a newsletter snippet" width="760">
 
 </div>
 
@@ -145,6 +147,17 @@ Stop hook       → scans Claude's final message → blocks completion if it
 ```
 
 The gate is tuned to stay out of your way: it only scans content files (`.md`, `.txt`, `.html` - never code), the final-message check only fires on substantial responses with three or more hard-slop hits, and it never blocks the same response twice. Words that are ordinary in technical conversation ("robust", "leverage", "seamless") are treated as soft signals rather than hard ones, so the gate won't nag you in coding sessions, and usage like "robust error handling" or "leverage ratio" is allowlisted entirely.
+
+**Your own banned phrases.** Every writer has personal cringe words. Add them to `~/.claude-content-engine/banned-phrases.txt`, one per line, and the gate treats them as must-fix:
+
+```
+# phrases I never want in my content
+circle back
+synergize
+at scale
+```
+
+Matching is case-insensitive and whole-word. Lines starting with `#` are ignored. You can also just tell Claude "never say X in my content" - the Content Memory skill saves it there for you.
 
 ## How It Works
 
