@@ -254,6 +254,8 @@ Yes. They're markdown files. Edit them, fork them, rewrite them entirely.
 
 ## Contributing
 
+If this saves you time, a star helps other people find it.
+
 New skills are accepted. See [CONTRIBUTING.md](CONTRIBUTING.md) for the format and quality checklist.
 
 ## License
