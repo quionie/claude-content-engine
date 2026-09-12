@@ -125,12 +125,34 @@
   .card .new { font-size: 10.5px; font-family: var(--mono); color: var(--bg);
     background: var(--green); border-radius: 4px; padding: 1px 6px; margin-left: 8px; vertical-align: 2px; }
 
-  .gate { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
-  @media (max-width: 640px) { .gate { grid-template-columns: 1fr; } }
-  .pane { background: var(--panel-solid); border: 1px solid var(--border); border-radius: 12px; padding: 20px; font-size: 14.5px; }
-  .pane .label { font-family: var(--mono); font-size: 12px; margin-bottom: 12px; }
-  .pane.bad .label { color: var(--red); } .pane.good .label { color: var(--green); }
-  .pane p { color: var(--dim); } .pane.bad s { color: #6e5a5e; }
+  .try { background: var(--panel-solid); border: 1px solid var(--border); border-radius: 14px;
+    overflow: hidden; box-shadow: 0 24px 60px rgba(0,0,0,.4); }
+  .try-head { display: flex; justify-content: space-between; align-items: center; gap: 12px;
+    flex-wrap: wrap; padding: 12px 16px; background: #191b28; border-bottom: 1px solid var(--border); }
+  .try-title { font-family: var(--mono); font-size: 12.5px; color: var(--dim); }
+  .tb { background: transparent; color: var(--dim); border: 1px solid var(--border); border-radius: 6px;
+    padding: 5px 11px; font-size: 12px; cursor: pointer; font-family: var(--mono); margin-left: 6px; transition: all .2s; }
+  .tb:hover { color: var(--fg); border-color: var(--border-lit); }
+  .tb.on { color: var(--orange); border-color: rgba(255,166,87,.5); }
+  .try-grid { display: grid; grid-template-columns: 1.15fr .85fr; min-height: 340px; }
+  @media (max-width: 760px) { .try-grid { grid-template-columns: 1fr; } }
+  #try-in { background: #14151f; color: var(--fg); border: 0; border-right: 1px solid var(--border);
+    padding: 18px 20px; font: 14px/1.7 var(--sans); resize: vertical; min-height: 340px; outline: none; }
+  @media (max-width: 760px) { #try-in { border-right: 0; border-bottom: 1px solid var(--border); } }
+  .report { padding: 18px 20px; font-family: var(--mono); font-size: 12.5px; line-height: 1.75; }
+  .report .rt { color: var(--faint); margin-bottom: 10px; }
+  .report .tier { margin: 12px 0 4px; font-weight: 600; }
+  .report .tier.high { color: var(--red); } .report .tier.med { color: var(--orange); } .report .tier.low { color: var(--dim); }
+  .report .f { color: var(--dim); padding-left: 14px; text-indent: -14px; }
+  .report .f b { color: var(--fg); font-weight: 600; }
+  .report .pass { color: var(--green); font-weight: 600; }
+  .report .stats { color: var(--faint); margin-top: 14px; padding-top: 12px; border-top: 1px solid var(--border); }
+
+  .metrics { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 10px; margin-top: 22px; }
+  .metric { background: var(--panel); border: 1px solid var(--border); border-radius: 10px; padding: 12px 14px;
+    font-family: var(--mono); font-size: 12px; display: flex; flex-direction: column; gap: 3px; }
+  .metric b { color: var(--orange); font-weight: 600; } .metric span { color: var(--dim); }
+  .fine { color: var(--faint); font-size: 13.5px; margin-top: 18px; max-width: 760px; }
 
   .cta { text-align: center; padding: 96px 0 30px; }
   .cta h2 { margin-bottom: 4px; }
@@ -237,25 +259,42 @@
     <div class="rv">
       <div class="kicker">THE QUALITY GATE</div>
       <h2>AI slop dies here</h2>
-      <p class="lede">Everyone learned to avoid "delve." The tell now is shape. Hooks scan everything Claude writes for vocabulary <em>and</em> rhythm — em-dash density, the "It's not X. It's Y." contrast, rhetorical questions that answer themselves, metronomic sentences, same-size paragraphs, the formulaic wrap-up — and feed findings back so it rewrites before you ever read it.</p>
+      <p class="lede">Everyone learned to avoid "delve." The tell now is shape. So the gate grades both: about 55 vocabulary patterns, plus eight structural metrics with real thresholds. Findings go back to Claude as context, so it rewrites before you ever see the draft.</p>
     </div>
-    <div class="gate rv">
-      <div class="pane bad">
-        <div class="label">&#10005; caught and rewritten</div>
-        <p><s>It's not about writing faster — it's about writing smarter. Why? Because the tools have changed, the audience has changed, and the standards have changed.</s></p>
+
+    <div class="try rv">
+      <div class="try-head">
+        <span class="try-title">Try it. This runs the gate's core rules in your browser.</span>
+        <span class="try-btns">
+          <button class="tb on" data-load="ai">AI draft</button>
+          <button class="tb" data-load="human">Human rewrite</button>
+          <button class="tb" data-load="clear">Clear</button>
+        </span>
       </div>
-      <div class="pane good">
-        <div class="label">&#10003; what ships instead</div>
-        <p>Write the post once. The engine turns it into a thread, a LinkedIn post, and a newsletter — in your voice, on your schedule.</p>
+      <div class="try-grid">
+        <textarea id="try-in" spellcheck="false" aria-label="Paste text to check"></textarea>
+        <div class="report" id="try-out" aria-live="polite"></div>
       </div>
     </div>
+
+    <div class="metrics rv">
+      <div class="metric"><b>em-dash density</b><span>&gt; 1.5 per 100 words</span></div>
+      <div class="metric"><b>"not X, but Y"</b><span>2 or more contrast constructions</span></div>
+      <div class="metric"><b>rhetorical questions</b><span>&gt; 15% of sentences</span></div>
+      <div class="metric"><b>tidy triples</b><span>3+ "A, B, and C" single-word lists</span></div>
+      <div class="metric"><b>sentence rhythm</b><span>length variation (cv) &lt; 0.30</span></div>
+      <div class="metric"><b>paragraph shape</b><span>length variation (cv) &lt; 0.25</span></div>
+      <div class="metric"><b>formulaic closer</b><span>"in conclusion", "what do you think?"</span></div>
+      <div class="metric"><b>readability</b><span>Flesch-Kincaid grade &gt; 13</span></div>
+    </div>
+    <p class="fine rv">Every metric has a minimum sample size, so short pieces and normal human variation don't trip it. Prose is extracted first: code, headings, lists, and tables are ignored. The project's own README is a regression test and has to pass clean.</p>
   </section>
 
   <section>
     <div class="grid rv">
-      <div class="card"><h3>local-first</h3><p>Everything lives in ~/.claude-content-engine/ on your machine. Delete the folder, it's gone.</p></div>
-      <div class="card"><h3>tested + CI</h3><p>The hooks ship with a real test suite, run on every push. MIT licensed, markdown all the way down.</p></div>
-      <div class="card"><h3>yours to edit</h3><p>Skills are plain markdown. Fork them, rewrite them, or contribute your own.</p></div>
+      <div class="card"><h3>local-first</h3><p>Memory, banned phrases, learnings: plain files in ~/.claude-content-engine/. Delete the folder and it's gone. Nothing leaves your machine except what you send to the model.</p></div>
+      <div class="card"><h3>tested + CI</h3><p>30 tests run on every push. The README is a fixture: real human prose has to pass the gate clean, so a threshold can't drift without breaking the build.</p></div>
+      <div class="card"><h3>yours to edit</h3><p>Every threshold is a named constant. Every skill is markdown. Fork it, tune it, ban your own words.</p></div>
     </div>
   </section>
 
@@ -333,6 +372,73 @@ function play() {
   setTimeout(play, t + 6000);
 }
 if (reduced) { render(PROMPT.length, LINES.length, false); } else { play(); }
+
+// Live quality gate: a browser port of the hook's core rules.
+var SAMPLES = {
+  ai: "Most teams think they have a writing problem — but that's not the real issue. It's not about writing faster. It's about writing smarter. Why? Because the tools have changed, the audience has changed, and the standards have changed. The result? Content that is polished, consistent, and forgettable.\n\nHere's what actually happens when you automate content — you get volume without voice. It's not a tool problem. It's a taste problem. The posts are clean, correct, and completely empty. Readers notice — even when they can't say why. They scroll past without a second thought. Engagement drops, reach drops, and trust drops with it.\n\nThe catch? It takes discipline to log everything — but the payoff compounds quickly. Teams that commit see the difference within a month — better hooks, better rhythm, better results. In conclusion, the future of content belongs to teams that learn from what they ship. What do you think?",
+  human: "Most teams I've worked with don't have a writing problem. They have a rewriting problem: the first draft comes out clean and generic, and nobody has the energy to make it sound like a person. Automating that step makes it worse. You get volume. The posts are correct, polished, and instantly forgettable, and readers scroll past them without being able to say why.\n\nThe fix that worked for us was boring. Log every piece you publish. Once a month, put the numbers next to the drafts and look for what won. Question hooks beat statement hooks for us by roughly 2x across nine threads, so question hooks became the default. Short paragraphs after long ones kept people reading. None of this needed a new tool, just the discipline to look."
+};
+var HARD = [/\bdelve\b/i, /\btapestry\b/i, /\bin today'?s (?:fast-paced|ever-changing|digital|modern) (?:world|landscape|era|age)\b/i, /\bit'?s (?:important|worth) not(?:e|ing)\b/i, /\bgame[ -]?changer\b/i, /\bunlock the power\b/i, /\bparadigm shift\b/i, /\bsynergy\b/i, /\bcut(?:ting)?[ -]?edge\b/i, /\brevolutioni[sz]e\b/i, /\bgroundbreaking\b/i, /\bworld-class\b/i, /\btransformative\b/i, /\bin the realm of\b/i];
+var SOFT = [/\bseamless(?:ly)?\b/i, /\bleverage\b(?! (?:ratio|point))/i, /\brobust\b(?! (?:error|test|check))/i, /\blet'?s (?:dive|explore|unpack)\b/i, /\bin conclusion\b/i, /\bhere'?s the thing\b/i, /\blet'?s be honest\b/i, /\bthe (?:landscape|world) of\b/i, /\bnavigat(?:e|ing) the\b/i, /\bmyriad\b/i, /\bplethora\b/i, /\butilize\b/i];
+var CONTRAST = [/\bnot (?:just|only|merely|simply)\b[^.!?\n]{2,80}?[,;.]\s*(?:but|it'?s|this is)\b/gi, /\b(?:it'?s|this is|that'?s|isn'?t) not (?:a |an |about |the )?[^.!?\n]{2,60}?\.\s+(?:it'?s|this is|that'?s)\b/gi];
+var CLOSERS = [/^(?:in (?:conclusion|summary|short)|to (?:sum|wrap) (?:up|it up)|ultimately|the bottom line|final thoughts)\b/i, /\b(?:what do you think|let me know in the comments|drop a comment|share this with someone|thanks for reading)\b/i];
+
+function cv(a) { if (a.length < 2) return null; var m = a.reduce(function (s, x) { return s + x; }, 0) / a.length; if (!m) return null;
+  var v = a.reduce(function (s, x) { return s + (x - m) * (x - m); }, 0) / a.length; return Math.sqrt(v) / m; }
+
+function gate(text) {
+  var out = { high: [], med: [], low: [] };
+  var paras = text.split(/\n\s*\n/).map(function (p) { return p.trim(); }).filter(Boolean);
+  var prose = paras.join(" ");
+  var words = prose.split(/\s+/).filter(Boolean).length;
+  var sents = prose.split(/(?<=[.!?])\s+/).filter(function (s) { return s.split(/\s+/).length >= 2; });
+  if (words < 50) return { out: out, words: words, sents: sents.length, empty: true };
+
+  HARD.forEach(function (re) { var m = prose.match(re); if (m) out.high.push([m[0], "AI filler phrase"]); });
+  var soft = []; SOFT.forEach(function (re) { var m = prose.match(re); if (m) soft.push(m[0]); });
+  if (soft.length >= 2) out.med.push([soft.join(", "), "several AI-sounding phrases together"]);
+
+  if (words >= 120) {
+    var dashes = (prose.match(/—|–| -- /g) || []).length, per100 = dashes / words * 100;
+    if (dashes >= 4 && per100 > 1.5) out.med.push([dashes + " em-dashes in " + words + " words (" + per100.toFixed(1) + " per 100)", "turn most into commas or periods"]);
+    var contrasts = CONTRAST.reduce(function (n, re) { return n + (prose.match(re) || []).length; }, 0);
+    if (contrasts >= 2) out.med.push([contrasts + " 'not X, but Y' constructions", "the most recognizable AI tic right now; keep at most one"]);
+    var qs = sents.filter(function (s) { return /\?$/.test(s); }).length;
+    if (sents.length && qs >= 3 && qs / sents.length > 0.15) out.med.push([qs + " questions in " + sents.length + " sentences", "rhetorical questions that answer themselves; state the point"]);
+    var triples = (prose.match(/\b\w+, \w+, and \w+\b/g) || []).length;
+    if (triples >= 3) out.low.push([triples + " single-word 'A, B, and C' triples", "machine-tidy; break some into pairs"]);
+    if (sents.length >= 10) { var L = sents.map(function (s) { return s.split(/\s+/).length; }), c = cv(L), mean = L.reduce(function (a, b) { return a + b; }, 0) / L.length;
+      if (c !== null && c < 0.30 && mean >= 8 && mean <= 35) out.med.push(["sentences average " + mean.toFixed(0) + " words with little variation (cv " + c.toFixed(2) + ")", "metronomic rhythm; follow a long sentence with a short one"]); }
+    if (paras.length >= 4) { var P = paras.map(function (p) { return p.split(/\s+/).length; }), pc = cv(P);
+      if (pc !== null && pc < 0.25) out.low.push([paras.length + " paragraphs all about the same length (cv " + pc.toFixed(2) + ")", "let one run long, drop a one-liner somewhere"]); }
+    var last = paras[paras.length - 1] || "";
+    for (var i = 0; i < CLOSERS.length; i++) { var cm = last.match(CLOSERS[i]); if (cm) { out.med.push(["'" + cm[0] + "'", "formulaic wrap-up; end on the strongest specific point"]); break; } }
+  }
+  return { out: out, words: words, sents: sents.length, empty: false };
+}
+
+function esc(s) { return s.replace(/&/g, "&amp;").replace(/</g, "&lt;"); }
+function renderReport(r) {
+  var el = document.getElementById("try-out"), h = '<div class="rt">$ content-quality-gate</div>';
+  if (r.empty) { el.innerHTML = h + '<div class="f">Paste at least 50 words to run the gate.</div>'; return; }
+  var total = r.out.high.length + r.out.med.length + r.out.low.length;
+  if (!total) h += '<div class="pass">+ Passed. No AI slop detected.</div>';
+  var tiers = [["high", "Must fix"], ["med", "Should fix"], ["low", "Consider"]];
+  tiers.forEach(function (t) { if (r.out[t[0]].length) { h += '<div class="tier ' + t[0] + '">' + t[1] + '</div>';
+    r.out[t[0]].forEach(function (f) { h += '<div class="f"><b>' + esc(f[0]) + '</b> - ' + esc(f[1]) + '</div>'; }); } });
+  h += '<div class="stats">' + r.words + ' words · ' + r.sents + ' sentences · ' + total + ' finding' + (total === 1 ? '' : 's') + (r.words < 120 ? ' · structure checks need 120+ words' : '') + '</div>';
+  el.innerHTML = h;
+}
+var tryIn = document.getElementById("try-in");
+function runGate() { renderReport(gate(tryIn.value)); }
+tryIn.addEventListener("input", runGate);
+document.querySelectorAll(".tb").forEach(function (b) {
+  b.addEventListener("click", function () {
+    document.querySelectorAll(".tb").forEach(function (x) { x.classList.remove("on"); }); b.classList.add("on");
+    tryIn.value = SAMPLES[b.dataset.load] || ""; runGate(); if (b.dataset.load === "clear") tryIn.focus();
+  });
+});
+tryIn.value = SAMPLES.ai; runGate();
 
 // Card glow follows the pointer
 document.querySelectorAll('.card').forEach(function (card) {
