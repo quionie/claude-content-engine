@@ -53,7 +53,7 @@ If you touched the hooks, also run the test suite (CI runs it on every PR):
 python3 tests/test_hooks.py
 ```
 
-The slop pattern lists live in `hooks/slop_patterns.py` - both hooks import from there, so add new patterns in that one place.
+The slop pattern lists live in `hooks/slop_patterns.py` - both hooks import from there, so add new patterns in that one place. Structural checks (em-dash density, sentence rhythm, contrast constructions, and so on) live in `hooks/structure.py`; each has a named threshold constant at the top of the file, and the test suite includes a real-prose regression check (the README must pass clean), so tune with care.
 
 ### 5. Submit a PR
 

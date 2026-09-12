@@ -8,6 +8,8 @@ this module so the pattern lists can't drift apart.
 import os
 import re
 
+from structure import scan_structure
+
 # Users can add their own banned phrases, one per line. Lines starting with
 # "#" and blank lines are ignored. The env var exists mainly so tests can
 # point at a fixture instead of the real file.
@@ -69,6 +71,13 @@ SOFT_SLOP = [
     r"\bcommence\b",
     r"\butilize\b",
     r"\bfacilitate\b",
+    # Stock openers
+    r"\bhere'?s the thing\b",
+    r"\blet'?s be honest\b",
+    r"\bpicture this\b",
+    r"\bthe truth is\b",
+    r"\bplot twist\b",
+    r"\bhot take\b",
 ]
 
 # --- Weak copy patterns ---
@@ -118,12 +127,15 @@ def _first_match(pattern, text):
     return match.group(0).strip() if match else None
 
 
-def scan_content(text, custom_patterns=None):
+def scan_content(text, custom_patterns=None, structure=True):
     """Scan text for quality issues. Returns a list of findings.
 
     custom_patterns overrides the user's banned-phrases file (pass [] to
     disable it); by default the file is loaded and merged in. Custom phrases
     count as hard findings - the user banned them on purpose.
+
+    structure=True also runs the rhythm-and-shape checks from structure.py
+    (em-dash density, contrast constructions, sentence variance, etc.).
     """
     findings = []
 
@@ -191,5 +203,8 @@ def scan_content(text, custom_patterns=None):
             "match": f"{exclamation_count} exclamation marks in {sentence_count} sentences",
             "suggestion": "Too many exclamation marks - reads as fake enthusiasm. Keep to 1-2 per piece max."
         })
+
+    if structure:
+        findings.extend(scan_structure(text))
 
     return findings

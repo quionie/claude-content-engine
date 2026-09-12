@@ -131,12 +131,13 @@ Memory is **local-only** (stored on your machine, never uploaded), **opt-in** (y
 
 ### 3. Quality Gate (AI Slop Detector)
 
-A hook that runs automatically on every piece of content Claude writes. Roughly 50 patterns across three severity tiers:
+A hook that runs automatically on every piece of content Claude writes. It checks vocabulary *and* shape:
 
 - **Hard slop** - "delve", "tapestry", "in today's fast-paced world", "it's important to note", "game-changer", and friends
-- **Soft slop** - "let's dive in", "as we've seen", "seamlessly", "the landscape of" - flagged when multiple appear together
+- **Soft slop** - "let's dive in", "here's the thing", "seamlessly", "the landscape of" - flagged when multiple appear together
 - **Weak copy** - "very good", "in order to", "I think that" - with specific rewrite suggestions
 - **Fake enthusiasm** - excessive exclamation marks that read as performative
+- **Structural slop** - the tells readers clock in 2026 even when every word is clean: em-dash density, the "It's not X. It's Y." contrast, rhetorical questions that answer themselves, tidy groups of three, metronomic sentence length, same-size paragraphs, the formulaic wrap-up, and a readability grade. Each is a measured metric with a stated threshold and a minimum sample size, so short pieces and normal human variation don't trip it.
 
 Claude gets the feedback and rewrites before you see the final output. You don't have to do anything.
 

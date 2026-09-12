@@ -1,5 +1,11 @@
 # Changelog
 
+## 2.4.0
+
+- Structural slop detection. The quality gate now grades shape, not just vocabulary: em-dash density, "It's not X. It's Y." contrast constructions, rhetorical-question density, tidy groups of three, metronomic sentence length, uniform paragraph length, formulaic closers, and a Flesch-Kincaid readability grade. Every check is a measured metric with an explicit threshold and a minimum sample size; prose is extracted first so code, headings, lists, and tables are ignored.
+- Structural findings feed back to Claude through the PostToolUse gate on content files. They never block the Stop hook on their own.
+- A few stock openers ("here's the thing", "let's be honest", "picture this") added to soft slop.
+
 ## 2.3.0
 
 - New skill: Content Retro - the learning loop. Pulls real performance data (connected analytics tools, or numbers you paste), compares winners against losers with honest evidence rules, and writes findings back into the engine's memory so future drafts start smarter.
