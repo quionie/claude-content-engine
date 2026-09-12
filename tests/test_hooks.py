@@ -12,13 +12,17 @@ import json
 import os
 import subprocess
 import sys
+import tempfile
 import unittest
 
 REPO_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 HOOKS_DIR = os.path.join(REPO_ROOT, "hooks")
 sys.path.insert(0, HOOKS_DIR)
 
-from slop_patterns import scan_content  # noqa: E402
+# Isolate every test from a real banned-phrases file on this machine.
+os.environ["CONTENT_ENGINE_BANNED_PHRASES"] = os.devnull
+
+from slop_patterns import load_custom_patterns, scan_content  # noqa: E402
 
 SLOPPY_TEXT = (
     "In today's fast-paced world, our game-changer platform will seamlessly "
@@ -45,16 +49,33 @@ ENGINEERING_TEXT = (
 )
 
 
-def run_hook(script, payload):
-    """Pipe a JSON payload into a hook script and return its parsed output."""
+def run_hook(script, payload, phrases_file=None):
+    """Pipe a JSON payload into a hook script and return its parsed output.
+
+    phrases_file points the hook at a banned-phrases fixture; by default the
+    hook sees an empty file so tests don't depend on this machine's config.
+    """
+    env = dict(os.environ)
+    env["CONTENT_ENGINE_BANNED_PHRASES"] = phrases_file or os.devnull
     result = subprocess.run(
         [sys.executable, os.path.join(HOOKS_DIR, script)],
         input=json.dumps(payload),
         capture_output=True,
         text=True,
         timeout=15,
+        env=env,
     )
     return result.returncode, json.loads(result.stdout)
+
+
+def write_phrases(*lines):
+    """Write a banned-phrases fixture file and return its path."""
+    f = tempfile.NamedTemporaryFile(
+        mode="w", suffix=".txt", delete=False, encoding="utf-8"
+    )
+    f.write("\n".join(lines) + "\n")
+    f.close()
+    return f.name
 
 
 class TestScanContent(unittest.TestCase):
@@ -89,6 +110,58 @@ class TestScanContent(unittest.TestCase):
         text = "Buy now! Amazing deal! Don't wait! Act fast! " * 3
         findings = scan_content(text)
         self.assertTrue(any(f["type"] == "tone" for f in findings))
+
+
+class TestCustomPhrases(unittest.TestCase):
+    def test_parses_file_skipping_comments_and_blanks(self):
+        path = write_phrases("# my cringe list", "", "circle back", "synergize")
+        try:
+            self.assertEqual(len(load_custom_patterns(path)), 2)
+        finally:
+            os.unlink(path)
+
+    def test_missing_file_means_no_patterns(self):
+        self.assertEqual(load_custom_patterns("/nonexistent/nope.txt"), [])
+
+    def test_custom_phrase_is_a_hard_finding(self):
+        findings = scan_content(
+            CLEAN_TEXT + " We should circle back on the dashboard question.",
+            custom_patterns=load_custom_patterns(
+                path := write_phrases("circle back")
+            ),
+        )
+        os.unlink(path)
+        custom = [f for f in findings if f["type"] == "custom_phrase"]
+        self.assertEqual(len(custom), 1)
+        self.assertEqual(custom[0]["severity"], "high")
+
+    def test_whole_word_matching(self):
+        path = write_phrases("ai")
+        try:
+            patterns = load_custom_patterns(path)
+            self.assertEqual(
+                scan_content(CLEAN_TEXT + " That idea stayed in my brain.",
+                             custom_patterns=patterns),
+                [],
+            )
+        finally:
+            os.unlink(path)
+
+    def test_quality_gate_flags_banned_phrase_in_content_file(self):
+        path = write_phrases("circle back")
+        try:
+            code, output = run_hook("quality_gate.py", {
+                "tool_input": {
+                    "file_path": "/tmp/post.md",
+                    "content": CLEAN_TEXT + " Let's circle back next week.",
+                },
+            }, phrases_file=path)
+        finally:
+            os.unlink(path)
+        self.assertEqual(code, 0)
+        context = output["hookSpecificOutput"]["additionalContext"]
+        self.assertIn("circle back", context)
+        self.assertIn("banned phrases list", context)
 
 
 class TestQualityGate(unittest.TestCase):

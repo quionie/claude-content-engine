@@ -5,7 +5,16 @@ Both quality_gate.py (PostToolUse) and content_review.py (Stop) import from
 this module so the pattern lists can't drift apart.
 """
 
+import os
 import re
+
+# Users can add their own banned phrases, one per line. Lines starting with
+# "#" and blank lines are ignored. The env var exists mainly so tests can
+# point at a fixture instead of the real file.
+CUSTOM_PHRASES_FILE = os.environ.get(
+    "CONTENT_ENGINE_BANNED_PHRASES",
+    os.path.join(os.path.expanduser("~"), ".claude-content-engine", "banned-phrases.txt"),
+)
 
 # --- AI slop patterns ---
 # Phrases that almost always signal lazy AI-generated text, by severity.
@@ -76,18 +85,64 @@ WEAK_PATTERNS = [
 ]
 
 
+def load_custom_patterns(path=None):
+    """Read the user's banned-phrases file into a list of regex patterns.
+
+    Each phrase is escaped and matched literally, with word boundaries added
+    where the phrase starts or ends with a word character (so "very unique"
+    won't match inside "delivery uniquely", but a phrase ending in "!" still
+    works). A missing or unreadable file just means no custom patterns.
+    """
+    if path is None:
+        path = CUSTOM_PHRASES_FILE
+    try:
+        with open(path, encoding="utf-8") as f:
+            lines = f.read().splitlines()
+    except OSError:
+        return []
+
+    patterns = []
+    for line in lines:
+        phrase = line.strip()
+        if not phrase or phrase.startswith("#"):
+            continue
+        prefix = r"\b" if (phrase[0].isalnum() or phrase[0] == "_") else ""
+        suffix = r"\b" if (phrase[-1].isalnum() or phrase[-1] == "_") else ""
+        patterns.append(prefix + re.escape(phrase) + suffix)
+    return patterns
+
+
 def _first_match(pattern, text):
     """Return the first match of pattern in text, or None."""
     match = re.search(pattern, text, re.IGNORECASE)
     return match.group(0).strip() if match else None
 
 
-def scan_content(text):
-    """Scan text for quality issues. Returns a list of findings."""
+def scan_content(text, custom_patterns=None):
+    """Scan text for quality issues. Returns a list of findings.
+
+    custom_patterns overrides the user's banned-phrases file (pass [] to
+    disable it); by default the file is loaded and merged in. Custom phrases
+    count as hard findings - the user banned them on purpose.
+    """
     findings = []
 
     if not text or len(text.strip()) < 50:
         return findings
+
+    if custom_patterns is None:
+        custom_patterns = load_custom_patterns()
+
+    # Check the user's own banned phrases
+    for pattern in custom_patterns:
+        matched = _first_match(pattern, text)
+        if matched:
+            findings.append({
+                "severity": "high",
+                "type": "custom_phrase",
+                "match": matched,
+                "suggestion": f"'{matched}' is on your banned phrases list - rewrite without it."
+            })
 
     # Check hard slop
     for pattern in HARD_SLOP:

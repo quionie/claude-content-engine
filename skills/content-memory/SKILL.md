@@ -1,7 +1,7 @@
 ---
 name: content-memory
 description: Store, recall, and build on persistent content knowledge across sessions. Use this skill when the user wants to save their brand voice, content pillars, audience personas, style preferences, top-performing content, or any reusable content context. Also trigger when the user says "remember my voice", "save this for later", "store my brand", "content brain", "recall my style", "what do you know about my brand", "use my saved voice", or references information that should persist across conversations. This skill also activates automatically when other content skills need persistent context (voice profiles, content pillars, audience data).
-version: 1.0.0
+version: 1.1.0
 ---
 
 # Content Memory
@@ -16,6 +16,7 @@ All content memory is stored in `~/.claude-content-engine/memory/`. Each memory 
 
 ```
 ~/.claude-content-engine/
+├── banned-phrases.txt          # Words the quality gate must flag (one per line)
 └── memory/
     ├── voice-profile.md        # Brand voice from Brand Voice Builder
     ├── content-pillars.md      # Recurring themes and topics
@@ -24,6 +25,8 @@ All content memory is stored in `~/.claude-content-engine/memory/`. Each memory 
     ├── top-content.md          # High-performing content log
     └── context.md              # Misc brand/product context
 ```
+
+`banned-phrases.txt` is special: the quality gate hooks read it directly, so a phrase saved there gets flagged automatically in everything Claude writes. When the user bans a specific word or phrase ("never say 'circle back'", "I hate the word 'utilize'"), append it there (one phrase per line, `#` for comments) *in addition to* recording the preference in `style-prefs.md`. Preferences about tone or structure that aren't a specific phrase belong only in `style-prefs.md`.
 
 ## How It Works
 

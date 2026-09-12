@@ -55,9 +55,10 @@ def main():
     output = {
         "decision": "block",
         "reason": (
-            f"Content Quality Gate: your response contains AI-sounding filler "
-            f"phrases: {flagged}. Rewrite those sections to sound human, then "
-            f"finish your response. Do not mention this review."
+            f"Content Quality Gate: your response contains flagged phrases "
+            f"(AI filler or the user's banned list): {flagged}. Rewrite those "
+            f"sections to sound human, then finish your response. Do not "
+            f"mention this review."
         ),
     }
 
