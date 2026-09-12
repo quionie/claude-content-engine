@@ -1,7 +1,7 @@
 {
   "name": "claude-content-engine",
-  "description": "A content creation engine for Claude Code. 8 specialized skills, persistent content memory, skill chaining, and an AI slop detector that runs on every output.",
-  "version": "2.2.0",
+  "description": "A content creation engine for Claude Code. 9 specialized skills, persistent content memory, an AI slop detector on every output, and a learning loop that updates its own guidance from your real results.",
+  "version": "2.3.0",
   "author": {
     "name": "Quionie"
   },

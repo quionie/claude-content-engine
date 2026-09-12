@@ -1,5 +1,12 @@
 # Changelog
 
+## 2.3.0
+
+- New skill: Content Retro - the learning loop. Pulls real performance data (connected analytics tools, or numbers you paste), compares winners against losers with honest evidence rules, and writes findings back into the engine's memory so future drafts start smarter.
+- Two new memory files: `content-log.md` (everything published, with metrics as they land) and `learnings.md` (data-backed findings and tracked experiments).
+- Drafting skills now read `learnings.md` and apply solid findings as defaults; running experiments are treated as instructions.
+- Redesigned the landing page.
+
 ## 2.2.0
 
 - User-defined banned phrases: add your own cringe words to `~/.claude-content-engine/banned-phrases.txt` (one per line, `#` comments) and the quality gate flags them as must-fix everywhere.

@@ -4,12 +4,12 @@
 
 **A content creation engine for Claude Code.**
 
-8 specialized skills. Persistent memory. A built-in quality gate that kills AI slop.<br>
+9 specialized skills. Persistent memory. A quality gate that kills AI slop. A learning loop that studies what performed.<br>
 Install in one command. Zero config.
 
 [![CI](https://github.com/quionie/claude-content-engine/actions/workflows/ci.yml/badge.svg)](https://github.com/quionie/claude-content-engine/actions/workflows/ci.yml)
 [![MIT License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
-[![Skills](https://img.shields.io/badge/skills-8-green.svg)](#skills)
+[![Skills](https://img.shields.io/badge/skills-9-green.svg)](#skills)
 [![Claude Code](https://img.shields.io/badge/Claude_Code-plugin-8A2BE2.svg)](https://claude.com/claude-code)
 
 [Website](https://claude-content-engine-quionie.vercel.app) · [Install](#install) · [Skills](#skills) · [Advanced Features](#advanced-features) · [Changelog](CHANGELOG.md) · [Contributing](CONTRIBUTING.md)
@@ -22,7 +22,7 @@ Install in one command. Zero config.
 
 ## Why this exists
 
-**claude-content-engine** installs 8 content skills, a persistent memory system, and an automatic slop detector into Claude Code. One command, zero config.
+**claude-content-engine** installs 9 content skills, a persistent memory system, an automatic slop detector, and a learning loop that updates the engine's own guidance from your real results into Claude Code. One command, zero config.
 
 You just ask naturally:
 
@@ -91,6 +91,7 @@ Uninstalling leaves your content memory at `~/.claude-content-engine/` in place.
 |:------|:-------------|:---------------|
 | **Content Workflow** | Runs multiple skills in sequence - output from one feeds into the next | *"Analyze my voice, write a blog post in it, then repurpose for social"* |
 | **Content Memory** | Stores your voice, audience, pillars, and preferences across sessions | *"Remember my brand voice for future sessions"* |
+| **Content Retro** | Analyzes real performance data and updates the engine's own guidance | *"Run a content retro - here are last month's numbers"* |
 
 ## Advanced Features
 
@@ -159,6 +160,18 @@ at scale
 
 Matching is case-insensitive and whole-word. Lines starting with `#` are ignored. You can also just tell Claude "never say X in my content" - the Content Memory skill saves it there for you.
 
+### 4. The Learning Loop
+
+Most content tools stop at drafting. This one closes the loop:
+
+```
+draft → publish → log → measure → learn → better draft
+```
+
+Every published piece gets logged to `content-log.md`. When you run a content retro - with connected analytics tools, or by just pasting your numbers - the engine compares winners against losers, extracts findings with real evidence behind them ("question hooks averaged 2.4x median impressions across 9 threads"), and writes them to `learnings.md`. Solid findings become drafting defaults; promising ones become tracked experiments the next retro grades.
+
+The guardrails: findings need at least 5 data points before they become rules, effect sizes are reported rather than vibes, and your voice profile is never edited automatically - performance data tunes tactics, but your voice is yours.
+
 ## How It Works
 
 Skills are `.md` files with YAML frontmatter. Claude reads the `description` field and auto-activates the right skill based on your prompt. No slash commands needed.
@@ -180,7 +193,7 @@ The hooks are Python scripts that run via Claude Code's [hook system](https://co
 
 ```
 claude-content-engine/
-├── skills/                        # 8 content skills
+├── skills/                        # 9 content skills
 │   ├── content-repurposer/SKILL.md
 │   ├── blog-post-architect/SKILL.md
 │   ├── copywriting-engine/SKILL.md
@@ -188,6 +201,7 @@ claude-content-engine/
 │   ├── email-sequence-builder/SKILL.md
 │   ├── social-media-calendar/SKILL.md
 │   ├── content-workflow/SKILL.md       ← skill chaining orchestrator
+│   ├── content-retro/SKILL.md          ← the learning loop
 │   └── content-memory/SKILL.md         ← persistent content memory
 ├── hooks/                         # quality gate system
 │   ├── hooks.json                      ← hook configuration

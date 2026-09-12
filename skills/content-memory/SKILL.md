@@ -1,7 +1,7 @@
 ---
 name: content-memory
 description: Store, recall, and build on persistent content knowledge across sessions. Use this skill when the user wants to save their brand voice, content pillars, audience personas, style preferences, top-performing content, or any reusable content context. Also trigger when the user says "remember my voice", "save this for later", "store my brand", "content brain", "recall my style", "what do you know about my brand", "use my saved voice", or references information that should persist across conversations. This skill also activates automatically when other content skills need persistent context (voice profiles, content pillars, audience data).
-version: 1.1.0
+version: 1.2.0
 ---
 
 # Content Memory
@@ -23,6 +23,8 @@ All content memory is stored in `~/.claude-content-engine/memory/`. Each memory 
     ├── audience.md             # Target audience personas
     ├── style-prefs.md          # Do's and don'ts for content
     ├── top-content.md          # High-performing content log
+    ├── content-log.md          # Everything published, with metrics as they land
+    ├── learnings.md            # Data-backed findings + experiments (Content Retro)
     └── context.md              # Misc brand/product context
 ```
 
@@ -41,6 +43,9 @@ When the user produces content context that should persist, **save it automatica
 | User describes their audience | Audience details | `audience.md` |
 | User gives style feedback ("don't use emojis", "always be casual") | Preference | `style-prefs.md` |
 | User flags a piece as high-performing | The content + why it worked | `top-content.md` |
+| A piece is finalized or the user says it was published | Date, platform, hook type, pillar, CTA | `content-log.md` |
+| User reports performance ("that thread blew up", pasted metrics) | Metrics appended to the piece's entry | `content-log.md` |
+| Content Retro produces a finding or experiment | Dated entry with evidence + confidence | `learnings.md` |
 | User shares brand/product context | Key details | `context.md` |
 
 **Save format:** each memory file uses this structure:
@@ -61,12 +66,15 @@ When the user produces content context that should persist, **save it automatica
 
 When any content skill activates, **check for stored memory first** and use it:
 
-- **Content Repurposer** → check `voice-profile.md` + `content-pillars.md`
-- **Blog Post Architect** → check `voice-profile.md` + `audience.md` + `style-prefs.md`
-- **Copywriting Engine** → check `voice-profile.md` + `audience.md` + `context.md`
-- **Email Sequence Builder** → check `voice-profile.md` + `audience.md` + `context.md`
-- **Social Media Calendar** → check `content-pillars.md` + `voice-profile.md` + `top-content.md`
+- **Content Repurposer** → check `voice-profile.md` + `content-pillars.md` + `learnings.md`
+- **Blog Post Architect** → check `voice-profile.md` + `audience.md` + `style-prefs.md` + `learnings.md`
+- **Copywriting Engine** → check `voice-profile.md` + `audience.md` + `context.md` + `learnings.md`
+- **Email Sequence Builder** → check `voice-profile.md` + `audience.md` + `context.md` + `learnings.md`
+- **Social Media Calendar** → check `content-pillars.md` + `voice-profile.md` + `top-content.md` + `learnings.md`
+- **Content Retro** → check `content-log.md` + `top-content.md` + `learnings.md` + `content-pillars.md`
 - **Content Workflow** → check all memory files
+
+`learnings.md` entries are data-backed rules from Content Retro ("question hooks averaged 2.4x on Twitter"). When drafting, apply **solid**-confidence learnings as defaults and treat running experiments as instructions (if an experiment says "open the next 5 threads with a number", do that).
 
 When recalling, briefly acknowledge: *"Using your saved brand voice and audience context."*
 
@@ -90,6 +98,8 @@ Respond to these natural language commands:
 | "Update my audience" | Rewrite `audience.md` with new info |
 | "Save this as a content pillar" | Append to `content-pillars.md` |
 | "This post did really well" | Log to `top-content.md` with notes |
+| "Run a content retro" / "what's working" | Hand off to the Content Retro skill |
+| "What have we learned?" | Read and summarize `learnings.md` |
 | "Reset everything" / "Clear my content brain" | Delete all memory files (confirm first) |
 | "Show my saved preferences" | Read and display `style-prefs.md` |
 | "Export my content brain" | Output all memory files as a single document |
