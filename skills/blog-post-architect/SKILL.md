@@ -1,7 +1,7 @@
 ---
 name: blog-post-architect
 description: Write, structure, or optimize blog posts with SEO best practices. Use this skill when the user wants to write a blog post, create an article, draft a long-form piece, optimize content for search engines, build a content outline, or needs help with blog structure. Also trigger when the user mentions "SEO", "blog", "article", "long-form content", "content outline", "meta description", "heading structure", or wants to turn an idea into a published piece.
-version: 2.0.0
+version: 2.1.0
 ---
 
 # Blog Post Architect
@@ -24,7 +24,7 @@ Differentiation sources (use at least one):
 
 ### Step 1: SERP Analysis (Before Writing Anything)
 
-Before touching an outline, analyze what already ranks:
+Before touching an outline, analyze what already ranks. **Do this internally** - it shapes the post, but the user asked for a post, not a report. Surface only the one-line differentiation angle in the outline. Print the full landscape only if the user asks for the SERP analysis.
 
 ```
 ## SERP Landscape for "[keyword]"
@@ -141,16 +141,19 @@ Present the outline and **ask for approval before writing the full post.** Don't
 
 ### Step 5: Deliverables
 
+Return the content, not the homework. Default output:
+
 1. **The full blog post** in markdown, ready to publish
-2. **Meta description** (155 chars max, reads as a pitch not a summary)
-3. **Title variations** (3 options):
-   - SEO-optimized (keyword-forward, clear intent match)
-   - Curiosity-driven (intriguing, click-worthy)
-   - Specific/numeric ("7 ways...", "How we increased X by Y%")
-4. **Featured snippet target:** which section is structured to win position 0, and what query it targets
-5. **Internal linking map:** 3-5 topics this post should link to and be linked from
-6. **Social snippet:** a one-liner optimized for social sharing (not the meta description)
-7. **Content differentiation statement:** one sentence explaining what this post offers that the top results don't
+2. **Notes - 5 lines or fewer:** meta description (155 chars max, reads as a pitch), two alternate titles (one keyword-forward, one curiosity-driven), and which section targets the featured snippet
+
+Then offer the extras in one line: *"Want the SERP analysis, an internal linking map, or a social snippet?"* Produce these **only on request**:
+
+- **SERP analysis:** the full landscape from Step 1
+- **Internal linking map:** 3-5 topics this post should link to and be linked from
+- **Social snippet:** a one-liner for sharing (not the meta description)
+- **Differentiation statement:** one sentence on what this post offers that the top results don't
+
+A post where half the output is apparatus is worse than a post. Everything in Steps 1-3 is thinking that makes Step 4 better; it earns its place in the output only when someone asks for it.
 
 ## Content Types
 

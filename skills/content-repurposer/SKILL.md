@@ -1,7 +1,7 @@
 ---
 name: content-repurposer
 description: Repurpose, transform, or adapt content from one format into multiple other formats. Use this skill when the user wants to turn a blog post into tweets, a newsletter into LinkedIn posts, a video script into a thread, a podcast into show notes, or any "turn this into that" content transformation. Also trigger when the user says "repurpose", "adapt this for", "turn this into", "create variations", "make this work for [platform]", or wants to maximize the reach of a single piece of content across channels.
-version: 2.0.0
+version: 2.1.0
 ---
 
 # Content Repurposer
@@ -40,7 +40,7 @@ Before generating any output, decompose the source content into its smallest reu
 7. **Emotional core:** [What feeling does this content create? Fear, relief, aspiration, outrage, curiosity?]
 ```
 
-Show this breakdown to the user before generating outputs. It proves you understood the content and lets them correct your interpretation.
+Do this breakdown **internally** - it's how you understand the content, not something the user asked to read. Show it only when the source is ambiguous enough that you need their correction before writing (keep it to 5 lines if so), or when they ask for it.
 
 ## Step 2: Platform Selection
 
@@ -58,31 +58,15 @@ If the user doesn't specify formats, recommend the **top 3 highest-impact format
 
 ## Step 3: Generate Platform-Native Versions
 
-For each format, output:
+For each format, output the content under a heading that names the angle - nothing else wrapped around it:
 
 ```
 ## [Platform]: [Angle in 5 words]
 
-**Why this angle for this platform:** [1 sentence: what about this platform's audience
-makes this specific angle work here]
-
-**Algorithmic note:** [What this platform's algorithm rewards that this post leans into.
-e.g., "LinkedIn boosts posts with high dwell time; the line breaks and story arc
-encourage slow reading"]
-
----
-
 [The actual content, ready to copy-paste]
-
----
-
-**Posting notes:**
-- Best time: [time window]
-- Hashtags/tags: [if applicable]
-- Engagement play: [what to do in the first 30 min after posting - reply to comments,
-  quote-tweet, pin, etc.]
-- Pair with: [suggested visual, link, or companion post]
 ```
+
+The reasoning behind the angle, the algorithmic rationale, best posting times, hashtags, and the first-30-minutes engagement play all inform how you write the version. They don't get printed per version. If one of them matters enough to mention, it goes in the 5-line notes at the end; the full set is available on request.
 
 ## Platform-Specific Craft
 
@@ -116,7 +100,7 @@ encourage slow reading"]
 
 ## Step 4: Distribution Sequence
 
-After generating all formats, recommend a posting sequence:
+A posting sequence is useful, but it's not the content. Produce it **only on request**:
 
 ```
 ## Distribution Plan
@@ -139,4 +123,13 @@ Day 5: [Platform] - [Newsletter goes last: it's the deepest version and benefits
 3. **Preserve voice, shift angle.** The tone stays consistent. The argument changes per platform.
 4. **Flag what's missing.** If the source content lacks data, a story, or a clear opinion that a format needs, say so and suggest additions.
 5. **Include the uncomfortable version.** For at least one platform, push the take further than the original. The slightly-too-bold version often performs best.
-6. **Add platform context the user might not know.** Current algorithm preferences, trending formats, or engagement patterns that affect how the content should be structured.
+6. **Platform context stays in the notes.** If an algorithm preference or trending format changed how you structured a version, say so in one line. Full per-platform strategy notes only on request.
+
+## Deliverables
+
+Return the versions, not the working. Default output:
+
+1. **Every platform-native version**, each under its own heading with its angle stated in a few words
+2. **Notes - 5 lines or fewer:** anything the source lacked that a format needed (rule 4), which version pushes the take furthest (rule 5), and one line of spacing advice ("don't post these two the same day")
+
+Then offer the extras in one line: *"Want the distribution sequence or the atomic-units breakdown?"* Produce these **only on request**: the atomic content units from Step 1, the distribution plan from Step 4, and per-platform algorithm notes.

@@ -1,5 +1,9 @@
 # Changelog
 
+## 2.4.1
+
+- Cut output bloat in the four biggest skills. An evaluation found skill outputs running 1.7-2.8x longer than needed, with only 33-49% of each file being usable content, because analytical scaffolding (SERP landscape, atomic-units breakdown, sequence maps, engagement plans, benchmark tables, distribution plans) was printed as deliverables. Blog Post Architect, Email Sequence Builder, Social Media Calendar, and Content Repurposer now return the requested content plus at most 5 lines of notes by default, and offer the extras in one line for anyone who wants them.
+
 ## 2.4.0
 
 - Structural slop detection. The quality gate now grades shape, not just vocabulary: em-dash density, "It's not X. It's Y." contrast constructions, rhetorical-question density, tidy groups of three, metronomic sentence length, uniform paragraph length, formulaic closers, and a Flesch-Kincaid readability grade. Every check is a measured metric with an explicit threshold and a minimum sample size; prose is extracted first so code, headings, lists, and tables are ignored.

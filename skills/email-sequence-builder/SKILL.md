@@ -1,7 +1,7 @@
 ---
 name: email-sequence-builder
 description: Design and write email sequences, drip campaigns, and automated email flows. Use this skill when the user wants to create a welcome sequence, onboarding emails, launch sequence, nurture campaign, re-engagement flow, abandoned cart emails, or any multi-email automated series. Also trigger when the user says "email sequence", "drip campaign", "email flow", "welcome series", "email automation", "nurture sequence", "launch emails", or wants to write a series of connected emails.
-version: 2.0.0
+version: 2.1.0
 ---
 
 # Email Sequence Builder
@@ -35,7 +35,7 @@ Establish before writing:
 
 ### Step 2: Sequence Architecture
 
-Before writing individual emails, map the full sequence with emotional arc:
+Before writing individual emails, map the full sequence with emotional arc. **Work this out internally** and keep the printed version to one line per email (day, purpose) - or skip printing it entirely for short sequences with no branching. The full map with emotional states and open loops is available on request.
 
 ```
 ## Sequence Map: [Name]
@@ -174,14 +174,17 @@ For every email in the sequence, output:
 
 ## Deliverables
 
-For every sequence, output:
-1. **Sequence map:** visual overview of timing, triggers, emotional arc, open loops, and conditional logic
-2. **All email copy:** ready to paste into an ESP, with merge tag syntax matching their platform
-3. **Segment notes:** conditional branching, exclusion rules, and behavioral triggers
-4. **Open loop map:** what curiosity thread carries from each email to the next
-5. **Testing recommendations:** what to A/B test first (always test subject lines before body copy)
-6. **Deliverability checklist:** spam trigger audit for the sequence
-7. **Success metrics:** target benchmarks:
+Return the emails, not the apparatus. Default output:
+
+1. **All email copy:** ready to paste into an ESP, with merge tag syntax matching their platform
+2. **Notes - 5 lines or fewer:** send timing in one line, any conditional branches or exclusion rules, and the one thing to A/B test first (always subject lines before body copy)
+
+Then offer the extras in one line: *"Want the full sequence map, a deliverability audit, or target benchmarks?"* Produce these **only on request**:
+
+- **Sequence map:** timing, triggers, emotional arc, open loops, and conditional logic in full
+- **Deliverability checklist:** spam trigger audit for the sequence
+- **Testing plan:** the full A/B roadmap beyond the first test
+- **Success benchmarks:**
 
 | Metric | Good | Great | Investigate if below |
 |:-------|:-----|:------|:--------------------|

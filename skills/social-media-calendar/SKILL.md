@@ -1,7 +1,7 @@
 ---
 name: social-media-calendar
 description: Generate social media content calendars, posting schedules, and batched social content. Use this skill when the user wants to plan social media posts, create a content calendar, batch social content for a week or month, schedule posts across platforms, or build a posting strategy. Also trigger when the user says "social media calendar", "content calendar", "posting schedule", "batch content", "plan my posts", "week of content", "month of content", or wants organized, scheduled social media output.
-version: 2.0.0
+version: 2.1.0
 ---
 
 # Social Media Calendar
@@ -70,7 +70,7 @@ Most people over-index on promotional. If more than 15% of posts are selling, th
 
 ### Step 3: Algorithm Awareness
 
-Every post should be crafted with the platform's reward system in mind:
+Every post should be crafted with the platform's reward system in mind. Use this table to shape the posts; don't print it or per-platform strategy notes unless the user asks for the algorithm strategy.
 
 | Platform | Algorithm rewards | Algorithm punishes | Optimal post structure |
 |:---------|:-----------------|:-------------------|:----------------------|
@@ -111,7 +111,7 @@ Output format - structured, scannable, actionable:
 
 ### Step 5: Engagement Strategy
 
-A calendar without an engagement plan is a monologue. For each week, include:
+A calendar without an engagement plan is a monologue - but the user asked for a calendar. Mention the engagement plan in one line of the notes and produce the full version **only on request**:
 
 ```
 ## Engagement Plan
@@ -133,7 +133,7 @@ A calendar without an engagement plan is a monologue. For each week, include:
 
 ### Step 6: Performance Framework
 
-Set benchmarks so the user knows what "good" looks like:
+Benchmarks help the user know what "good" looks like. Produce them **only on request** - they're reference material, not the calendar:
 
 ```
 ## Performance Benchmarks
@@ -273,10 +273,18 @@ Don't create new content when old content can work harder:
 
 ## Deliverables
 
+Return the calendar, not the strategy deck. Default output:
+
 1. **Content calendar:** full structured calendar with all post copy, visuals described, and posting times
-2. **Content pillar breakdown:** pillars, ratios, and strategic purpose
-3. **Algorithm strategy:** per-platform optimization notes
-4. **Engagement plan:** daily and weekly engagement actions
-5. **Performance benchmarks:** what good looks like for their follower count
-6. **Recycling plan:** which posts are evergreen, when to repost, cross-platform adaptation opportunities
-7. **Next calendar prep:** based on the current calendar, what to watch for and what to test next time
+2. **Notes - 5 lines or fewer:** the pillar ratio in one line, a batching suggestion, and the one thing to watch or test this cycle
+
+Then offer the extras in one line: *"Want the engagement plan, performance benchmarks, or a recycling plan?"* Produce these **only on request**:
+
+- **Content pillar breakdown:** pillars, ratios, and strategic purpose in full
+- **Algorithm strategy:** per-platform optimization notes
+- **Engagement plan:** daily and weekly engagement actions
+- **Performance benchmarks:** what good looks like for their follower count
+- **Recycling plan:** which posts are evergreen, when to repost, cross-platform adaptation opportunities
+- **Next calendar prep:** what to watch for and what to test next time
+
+The pillar framework, algorithm awareness, engagement thinking, and benchmarks all still happen - they shape which posts make the calendar. They just don't get printed unless asked.
