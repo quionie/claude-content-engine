@@ -259,12 +259,12 @@
     <div class="rv">
       <div class="kicker">THE QUALITY GATE</div>
       <h2>AI slop dies here</h2>
-      <p class="lede">Everyone learned to avoid "delve." The tell now is shape. So the gate grades both: about 55 vocabulary patterns, plus eight structural metrics with real thresholds. Findings go back to Claude as context, so it rewrites before you ever see the draft.</p>
+      <p class="lede">Everyone learned to avoid "delve." The tell now is shape. The gate grades both, and Claude rewrites before you ever see the draft.</p>
     </div>
 
     <div class="try rv">
       <div class="try-head">
-        <span class="try-title">Try it. This runs the gate's core rules in your browser.</span>
+        <span class="try-title">Paste anything. The gate's core rules run right here.</span>
         <span class="try-btns">
           <button class="tb on" data-load="ai">AI draft</button>
           <button class="tb" data-load="human">Human rewrite</button>
@@ -287,14 +287,14 @@
       <div class="metric"><b>formulaic closer</b><span>"in conclusion", "what do you think?"</span></div>
       <div class="metric"><b>readability</b><span>Flesch-Kincaid grade &gt; 13</span></div>
     </div>
-    <p class="fine rv">Every metric has a minimum sample size, so short pieces and normal human variation don't trip it. Prose is extracted first: code, headings, lists, and tables are ignored. The project's own README is a regression test and has to pass clean.</p>
+    <p class="fine rv">Minimum sample sizes on every metric. Prose only. The README has to pass clean.</p>
   </section>
 
   <section>
     <div class="grid rv">
-      <div class="card"><h3>local-first</h3><p>Memory, banned phrases, learnings: plain files in ~/.claude-content-engine/. Delete the folder and it's gone. Nothing leaves your machine except what you send to the model.</p></div>
-      <div class="card"><h3>tested + CI</h3><p>30 tests run on every push. The README is a fixture: real human prose has to pass the gate clean, so a threshold can't drift without breaking the build.</p></div>
-      <div class="card"><h3>yours to edit</h3><p>Every threshold is a named constant. Every skill is markdown. Fork it, tune it, ban your own words.</p></div>
+      <div class="card"><h3>local-first</h3><p>Plain files in ~/.claude-content-engine/. Delete the folder, it's gone.</p></div>
+      <div class="card"><h3>tested + CI</h3><p>30 tests on every push. The README is a fixture: real prose has to pass clean.</p></div>
+      <div class="card"><h3>yours to edit</h3><p>Thresholds are named constants. Skills are markdown. Fork it, tune it, ban your own words.</p></div>
     </div>
   </section>
 
