@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>claude-content-engine — a content creation engine for Claude Code</title>
+<meta name="description" content="8 content skills, persistent memory, and an AI slop detector for Claude Code. One command to install, zero config.">
+<meta property="og:title" content="claude-content-engine">
+<meta property="og:description" content="A content creation engine for Claude Code. 8 skills, persistent memory, and a quality gate that kills AI slop.">
+<meta property="og:image" content="https://raw.githubusercontent.com/quionie/claude-content-engine/main/assets/demo.gif">
+<meta property="og:type" content="website">
+<style>
+  :root {
+    --bg: #14151f;
+    --panel: #1c1e2c;
+    --panel-2: #232538;
+    --border: #2e3147;
+    --fg: #e8e9f4;
+    --dim: #9298b0;
+    --green: #7ee787;
+    --orange: #ffa657;
+    --cyan: #80cbe6;
+    --mono: "SF Mono", Menlo, Consolas, "Liberation Mono", monospace;
+    --sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { background: var(--bg); color: var(--fg); font-family: var(--sans); line-height: 1.6; }
+  a { color: var(--cyan); text-decoration: none; }
+  a:hover { text-decoration: underline; }
+  .wrap { max-width: 960px; margin: 0 auto; padding: 0 24px; }
+
+  nav { display: flex; justify-content: space-between; align-items: center; padding: 20px 0; }
+  nav .brand { font-family: var(--mono); font-size: 15px; color: var(--fg); }
+  nav .brand span { color: var(--orange); }
+  nav .links a { color: var(--dim); margin-left: 20px; font-size: 14px; }
+  nav .links a:hover { color: var(--fg); }
+
+  header { text-align: center; padding: 56px 0 40px; }
+  h1 { font-size: clamp(28px, 5vw, 44px); line-height: 1.15; letter-spacing: -0.5px; }
+  h1 em { font-style: normal; color: var(--orange); }
+  .sub { color: var(--dim); font-size: 18px; max-width: 620px; margin: 16px auto 0; }
+
+  .install { display: inline-flex; align-items: center; gap: 12px; margin-top: 28px;
+    background: var(--panel); border: 1px solid var(--border); border-radius: 8px;
+    padding: 12px 16px; font-family: var(--mono); font-size: 13px; max-width: 100%; }
+  .install code { color: var(--green); overflow-x: auto; white-space: nowrap; scrollbar-width: none; }
+  .install button { background: var(--panel-2); color: var(--fg); border: 1px solid var(--border);
+    border-radius: 6px; padding: 5px 12px; font-size: 12px; cursor: pointer; font-family: var(--sans); flex-shrink: 0; }
+  .install button:hover { border-color: var(--dim); }
+  .alt-install { color: var(--dim); font-size: 13px; margin-top: 12px; font-family: var(--mono); }
+
+  .demo { margin: 40px auto 0; max-width: 820px; }
+  .demo img { width: 100%; border-radius: 10px; border: 1px solid var(--border); display: block; }
+
+  section { padding: 56px 0 8px; }
+  h2 { font-size: 24px; margin-bottom: 6px; }
+  .lede { color: var(--dim); margin-bottom: 28px; }
+
+  .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 14px; }
+  .card { background: var(--panel); border: 1px solid var(--border); border-radius: 10px; padding: 18px; }
+  .card h3 { font-size: 15px; font-family: var(--mono); color: var(--orange); margin-bottom: 6px; font-weight: 600; }
+  .card p { font-size: 14px; color: var(--dim); }
+
+  .gate { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-top: 8px; }
+  .gate .pane { background: var(--panel); border: 1px solid var(--border); border-radius: 10px; padding: 18px; font-size: 14px; }
+  .gate .label { font-family: var(--mono); font-size: 12px; margin-bottom: 10px; }
+  .gate .bad .label { color: #ff7b72; }
+  .gate .good .label { color: var(--green); }
+  .gate p { color: var(--dim); }
+  .gate .bad p s { color: #6e5a5e; }
+  @media (max-width: 640px) { .gate { grid-template-columns: 1fr; } }
+
+  .feature-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 14px; }
+
+  footer { border-top: 1px solid var(--border); margin-top: 72px; padding: 28px 0 40px;
+    color: var(--dim); font-size: 13px; display: flex; flex-wrap: wrap; gap: 8px 24px; justify-content: center; text-align: center; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <nav>
+    <div class="brand"><span>&gt;</span> claude-content-engine</div>
+    <div class="links">
+      <a href="https://github.com/quionie/claude-content-engine">GitHub</a>
+      <a href="https://github.com/quionie/claude-content-engine/blob/main/CHANGELOG.md">Changelog</a>
+    </div>
+  </nav>
+
+  <header>
+    <h1>Give Claude Code a full<br><em>content playbook</em></h1>
+    <p class="sub">8 content skills, persistent brand memory, and a quality gate that catches AI slop before you ever see it. One command to install, zero config.</p>
+    <div class="install">
+      <code id="cmd">curl -fsSL https://raw.githubusercontent.com/quionie/claude-content-engine/main/install.sh | bash</code>
+      <button onclick="copyCmd(this)">Copy</button>
+    </div>
+    <p class="alt-install">or, inside Claude Code: /plugin marketplace add quionie/claude-content-engine</p>
+    <div class="demo"><img src="https://raw.githubusercontent.com/quionie/claude-content-engine/main/assets/demo.gif" alt="One prompt turning a blog post into a Twitter thread, a LinkedIn post, and a newsletter snippet"></div>
+  </header>
+
+  <section>
+    <h2>Eight skills, one engine</h2>
+    <p class="lede">Ask naturally — Claude picks the right skill and loads your saved voice.</p>
+    <div class="grid">
+      <div class="card"><h3>content-repurposer</h3><p>One piece of content becomes platform-native versions for Twitter, LinkedIn, email, and more. Re-angled, not resized.</p></div>
+      <div class="card"><h3>blog-post-architect</h3><p>SEO-structured posts with a differentiation angle — meta descriptions, heading structure, internal links.</p></div>
+      <div class="card"><h3>copywriting-engine</h3><p>Headlines, landing pages, and ad copy built on PAS, AIDA, and BAB frameworks.</p></div>
+      <div class="card"><h3>brand-voice-builder</h3><p>Feed it your best writing; get a reusable voice profile any future session can follow.</p></div>
+      <div class="card"><h3>email-sequence-builder</h3><p>Full drip campaigns — welcome, launch, onboarding, re-engagement — with timing and exit logic.</p></div>
+      <div class="card"><h3>social-media-calendar</h3><p>Weeks of scheduled, platform-formatted content mapped to your pillars.</p></div>
+      <div class="card"><h3>content-workflow</h3><p>Chains skills into pipelines: voice → blog post → repurposed set → posting calendar, in one run.</p></div>
+      <div class="card"><h3>content-memory</h3><p>Your voice, audience, and preferences persist across sessions. Explain your brand once.</p></div>
+    </div>
+  </section>
+
+  <section>
+    <h2>The quality gate</h2>
+    <p class="lede">Hooks scan everything Claude writes — about 50 patterns across three severity tiers — and feed the findings back so it rewrites before you read it. Add your own banned phrases and they're enforced too.</p>
+    <div class="gate">
+      <div class="pane bad">
+        <div class="label">✕ caught and rewritten</div>
+        <p><s>In today's fast-paced world, our game-changing platform seamlessly revolutionizes your content workflow.</s></p>
+      </div>
+      <div class="pane good">
+        <div class="label">✓ what ships instead</div>
+        <p>Write the post once. The engine turns it into a thread, a LinkedIn post, and a newsletter — in your voice, on your schedule.</p>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <h2>Built like a tool, not a prompt pack</h2>
+    <div class="feature-row">
+      <div class="card"><h3>local-first memory</h3><p>Everything lives in ~/.claude-content-engine/ on your machine. Delete the folder, it's gone.</p></div>
+      <div class="card"><h3>tested + CI</h3><p>The hooks ship with a real test suite, run on every push. MIT licensed, markdown all the way down.</p></div>
+      <div class="card"><h3>yours to edit</h3><p>Skills are plain markdown files. Fork them, rewrite them, or contribute your own.</p></div>
+    </div>
+  </section>
+
+  <footer>
+    <span>MIT License</span>
+    <a href="https://github.com/quionie/claude-content-engine">github.com/quionie/claude-content-engine</a>
+    <span>Built by <a href="https://github.com/quionie">Quionie</a></span>
+    <span>A community plugin — not affiliated with Anthropic</span>
+  </footer>
+</div>
+<script>
+function copyCmd(btn) {
+  navigator.clipboard.writeText(document.getElementById('cmd').textContent).then(function () {
+    btn.textContent = 'Copied';
+    setTimeout(function () { btn.textContent = 'Copy'; }, 1600);
+  });
+}
+</script>
+</body>
+</html>
