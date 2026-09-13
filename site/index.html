@@ -134,10 +134,10 @@
     padding: 5px 11px; font-size: 12px; cursor: pointer; font-family: var(--mono); margin-left: 6px; transition: all .2s; }
   .tb:hover { color: var(--fg); border-color: var(--border-lit); }
   .tb.on { color: var(--orange); border-color: rgba(255,166,87,.5); }
-  .try-grid { display: grid; grid-template-columns: 1.15fr .85fr; min-height: 340px; }
+  .try-grid { display: grid; grid-template-columns: 1.15fr .85fr; min-height: 250px; }
   @media (max-width: 760px) { .try-grid { grid-template-columns: 1fr; } }
   #try-in { background: #14151f; color: var(--fg); border: 0; border-right: 1px solid var(--border);
-    padding: 18px 20px; font: 14px/1.7 var(--sans); resize: vertical; min-height: 340px; outline: none; }
+    padding: 18px 20px; font: 14px/1.7 var(--sans); resize: vertical; min-height: 250px; outline: none; }
   @media (max-width: 760px) { #try-in { border-right: 0; border-bottom: 1px solid var(--border); } }
   .report { padding: 18px 20px; font-family: var(--mono); font-size: 12.5px; line-height: 1.75; }
   .report .rt { color: var(--faint); margin-bottom: 10px; }
@@ -148,11 +148,10 @@
   .report .pass { color: var(--green); font-weight: 600; }
   .report .stats { color: var(--faint); margin-top: 14px; padding-top: 12px; border-top: 1px solid var(--border); }
 
-  .metrics { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 10px; margin-top: 22px; }
-  .metric { background: var(--panel); border: 1px solid var(--border); border-radius: 10px; padding: 12px 14px;
-    font-family: var(--mono); font-size: 12px; display: flex; flex-direction: column; gap: 3px; }
-  .metric b { color: var(--orange); font-weight: 600; } .metric span { color: var(--dim); }
-  .fine { color: var(--faint); font-size: 13.5px; margin-top: 18px; max-width: 760px; }
+  .chips { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 18px; justify-content: center; }
+  .chips span { font-family: var(--mono); font-size: 11.5px; color: var(--dim); border: 1px solid var(--border);
+    border-radius: 999px; padding: 4px 11px; }
+  .strip { text-align: center; font-family: var(--mono); font-size: 12.5px; color: var(--faint); padding: 56px 0 0; }
 
   .cta { text-align: center; padding: 96px 0 30px; }
   .cta h2 { margin-bottom: 4px; }
@@ -184,7 +183,7 @@
 
 <div class="wrap">
   <header>
-    <span class="eyebrow"><span class="pulse"></span>v2.4.0 — now grades structure, not just words</span>
+    <span class="eyebrow"><span class="pulse"></span>v2.4.1 &middot; free and open source</span>
     <h1>The content engine<br>that <span class="grad">learns what works</span></h1>
     <p class="sub">9 content skills for Claude Code with persistent brand memory and an AI slop detector — plus a closed loop that studies your <b>real results</b> and rewrites its own guidance.</p>
     <div class="install">
@@ -277,26 +276,12 @@
       </div>
     </div>
 
-    <div class="metrics rv">
-      <div class="metric"><b>em-dash density</b><span>&gt; 1.5 per 100 words</span></div>
-      <div class="metric"><b>"not X, but Y"</b><span>2 or more contrast constructions</span></div>
-      <div class="metric"><b>rhetorical questions</b><span>&gt; 15% of sentences</span></div>
-      <div class="metric"><b>tidy triples</b><span>3+ "A, B, and C" single-word lists</span></div>
-      <div class="metric"><b>sentence rhythm</b><span>length variation (cv) &lt; 0.30</span></div>
-      <div class="metric"><b>paragraph shape</b><span>length variation (cv) &lt; 0.25</span></div>
-      <div class="metric"><b>formulaic closer</b><span>"in conclusion", "what do you think?"</span></div>
-      <div class="metric"><b>readability</b><span>Flesch-Kincaid grade &gt; 13</span></div>
+    <div class="chips rv">
+      <span>em-dashes</span><span>"not X, but Y"</span><span>rhetorical questions</span><span>tidy triples</span><span>sentence rhythm</span><span>paragraph shape</span><span>formulaic closers</span><span>readability</span>
     </div>
-    <p class="fine rv">Minimum sample sizes on every metric. Prose only. The README has to pass clean.</p>
   </section>
 
-  <section>
-    <div class="grid rv">
-      <div class="card"><h3>local-first</h3><p>Plain files in ~/.claude-content-engine/. Delete the folder, it's gone.</p></div>
-      <div class="card"><h3>tested + CI</h3><p>30 tests on every push. The README is a fixture: real prose has to pass clean.</p></div>
-      <div class="card"><h3>yours to edit</h3><p>Thresholds are named constants. Skills are markdown. Fork it, tune it, ban your own words.</p></div>
-    </div>
-  </section>
+  <p class="strip rv">MIT &middot; local-first, plain files &middot; 30 tests on every push &middot; every threshold is a named constant</p>
 
   <div class="cta rv">
     <h2>Install it in one command</h2>
@@ -375,7 +360,7 @@ if (reduced) { render(PROMPT.length, LINES.length, false); } else { play(); }
 
 // Live quality gate: a browser port of the hook's core rules.
 var SAMPLES = {
-  ai: "Most teams think they have a writing problem — but that's not the real issue. It's not about writing faster. It's about writing smarter. Why? Because the tools have changed, the audience has changed, and the standards have changed. The result? Content that is polished, consistent, and forgettable.\n\nHere's what actually happens when you automate content — you get volume without voice. It's not a tool problem. It's a taste problem. The posts are clean, correct, and completely empty. Readers notice — even when they can't say why. They scroll past without a second thought. Engagement drops, reach drops, and trust drops with it.\n\nThe catch? It takes discipline to log everything — but the payoff compounds quickly. Teams that commit see the difference within a month — better hooks, better rhythm, better results. In conclusion, the future of content belongs to teams that learn from what they ship. What do you think?",
+  ai: "Most teams think they have a writing problem — but that's not the real issue. It's not about writing faster. It's about writing smarter. Why? Because the tools changed, the audience changed, and the standards changed. The result? Content that is polished, consistent, and forgettable.\n\nHere's what happens when you automate it — volume without voice. It's not a tool problem. It's a taste problem. Readers notice — even when they can't say why — and they scroll past. Nobody shares it, nobody saves it. Engagement drops, reach drops, and trust drops with it. The catch? Fixing it takes discipline — but the payoff compounds. In conclusion, the future belongs to teams that learn from what they ship. What do you think?",
   human: "Most teams I've worked with don't have a writing problem. They have a rewriting problem: the first draft comes out clean and generic, and nobody has the energy to make it sound like a person. Automating that step makes it worse. You get volume. The posts are correct, polished, and instantly forgettable, and readers scroll past them without being able to say why.\n\nThe fix that worked for us was boring. Log every piece you publish. Once a month, put the numbers next to the drafts and look for what won. Question hooks beat statement hooks for us by roughly 2x across nine threads, so question hooks became the default. Short paragraphs after long ones kept people reading. None of this needed a new tool, just the discipline to look."
 };
 var HARD = [/\bdelve\b/i, /\btapestry\b/i, /\bin today'?s (?:fast-paced|ever-changing|digital|modern) (?:world|landscape|era|age)\b/i, /\bit'?s (?:important|worth) not(?:e|ing)\b/i, /\bgame[ -]?changer\b/i, /\bunlock the power\b/i, /\bparadigm shift\b/i, /\bsynergy\b/i, /\bcut(?:ting)?[ -]?edge\b/i, /\brevolutioni[sz]e\b/i, /\bgroundbreaking\b/i, /\bworld-class\b/i, /\btransformative\b/i, /\bin the realm of\b/i];
@@ -394,25 +379,25 @@ function gate(text) {
   var sents = prose.split(/(?<=[.!?])\s+/).filter(function (s) { return s.split(/\s+/).length >= 2; });
   if (words < 50) return { out: out, words: words, sents: sents.length, empty: true };
 
-  HARD.forEach(function (re) { var m = prose.match(re); if (m) out.high.push([m[0], "AI filler phrase"]); });
+  HARD.forEach(function (re) { var m = prose.match(re); if (m) out.high.push([m[0], "AI filler"]); });
   var soft = []; SOFT.forEach(function (re) { var m = prose.match(re); if (m) soft.push(m[0]); });
-  if (soft.length >= 2) out.med.push([soft.join(", "), "several AI-sounding phrases together"]);
+  if (soft.length >= 2) out.med.push([soft.join(", "), "AI-sounding phrases"]);
 
   if (words >= 120) {
     var dashes = (prose.match(/—|–| -- /g) || []).length, per100 = dashes / words * 100;
-    if (dashes >= 4 && per100 > 1.5) out.med.push([dashes + " em-dashes in " + words + " words (" + per100.toFixed(1) + " per 100)", "turn most into commas or periods"]);
+    if (dashes >= 4 && per100 > 1.5) out.med.push([dashes + " em-dashes / " + words + " words", "em-dash overload"]);
     var contrasts = CONTRAST.reduce(function (n, re) { return n + (prose.match(re) || []).length; }, 0);
-    if (contrasts >= 2) out.med.push([contrasts + " 'not X, but Y' constructions", "the most recognizable AI tic right now; keep at most one"]);
+    if (contrasts >= 2) out.med.push([contrasts + "x 'not X, but Y'", "the signature AI tic"]);
     var qs = sents.filter(function (s) { return /\?$/.test(s); }).length;
-    if (sents.length && qs >= 3 && qs / sents.length > 0.15) out.med.push([qs + " questions in " + sents.length + " sentences", "rhetorical questions that answer themselves; state the point"]);
+    if (sents.length && qs >= 3 && qs / sents.length > 0.15) out.med.push([qs + " questions / " + sents.length + " sentences", "they answer themselves"]);
     var triples = (prose.match(/\b\w+, \w+, and \w+\b/g) || []).length;
-    if (triples >= 3) out.low.push([triples + " single-word 'A, B, and C' triples", "machine-tidy; break some into pairs"]);
+    if (triples >= 3) out.low.push([triples + "x 'A, B, and C'", "machine-tidy lists"]);
     if (sents.length >= 10) { var L = sents.map(function (s) { return s.split(/\s+/).length; }), c = cv(L), mean = L.reduce(function (a, b) { return a + b; }, 0) / L.length;
-      if (c !== null && c < 0.30 && mean >= 8 && mean <= 35) out.med.push(["sentences average " + mean.toFixed(0) + " words with little variation (cv " + c.toFixed(2) + ")", "metronomic rhythm; follow a long sentence with a short one"]); }
+      if (c !== null && c < 0.30 && mean >= 8 && mean <= 35) out.med.push(["sentence length cv " + c.toFixed(2), "metronomic rhythm"]); }
     if (paras.length >= 4) { var P = paras.map(function (p) { return p.split(/\s+/).length; }), pc = cv(P);
-      if (pc !== null && pc < 0.25) out.low.push([paras.length + " paragraphs all about the same length (cv " + pc.toFixed(2) + ")", "let one run long, drop a one-liner somewhere"]); }
+      if (pc !== null && pc < 0.25) out.low.push(["paragraph length cv " + pc.toFixed(2), "same-size paragraphs"]); }
     var last = paras[paras.length - 1] || "";
-    for (var i = 0; i < CLOSERS.length; i++) { var cm = last.match(CLOSERS[i]); if (cm) { out.med.push(["'" + cm[0] + "'", "formulaic wrap-up; end on the strongest specific point"]); break; } }
+    for (var i = 0; i < CLOSERS.length; i++) { var cm = last.match(CLOSERS[i]); if (cm) { out.med.push(["'" + cm[0] + "'", "formulaic wrap-up"]); break; } }
   }
   return { out: out, words: words, sents: sents.length, empty: false };
 }
